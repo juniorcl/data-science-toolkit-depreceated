@@ -27,7 +27,7 @@ class GaussianTransformer(object):
     
     Author
     ----------
-    Created by Clébio Júnior (github.com/juniorcl)
+    Created by Clébio dde Oliveira Júnior (github.com/juniorcl)
     """
 
     def __init__(self, variables: List, pvalue: float = 0.05, drop_original: bool = False, keep_max: bool = False):
@@ -46,26 +46,32 @@ class GaussianTransformer(object):
         for variable in self.variables_:
 
             self.alpha_results_[variable] = {}
+            
             self.lmbdas_[variable] = {}
 
             _, alpha = stats.normaltest(X[variable])
+            
             self.alpha_results_[variable]['original'] = alpha
             
             transformed_data, lmbda = stats.yeojohnson(X[variable])
             _, alpha = stats.normaltest(transformed_data)
+            
             self.alpha_results_[variable]['yj'] = alpha
             self.lmbdas_[variable] = lmbda
 
             transformed_data = np.log(X[variable])
             _, alpha = stats.normaltest(transformed_data)
+            
             self.alpha_results_[variable]['log'] = alpha
 
             transformed_data = np.sqrt(X[variable])
             _, alpha = stats.normaltest(transformed_data)
+            
             self.alpha_results_[variable]['sqrt'] = alpha
 
             transformed_data = np.cbrt(X[variable])
             _, alpha = stats.normaltest(transformed_data)
+            
             self.alpha_results_[variable]['cbrt'] = alpha
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -77,7 +83,10 @@ class GaussianTransformer(object):
             dict_alphas = self.alpha_results_[variable]
             
             is_original_normal = dict_alphas['original'] > self.pvalue_
-            is_any_true = any(list(map(lambda i: i > self.pvalue_, dict_alphas.values())))
+            
+            alpha_values = dict_alphas.values()
+            
+            is_any_true = any(list(map(lambda i: i > self.pvalue_, alpha_values)))
 
             if is_any_true and is_original_normal == False:
                 
@@ -99,9 +108,12 @@ class GaussianTransformer(object):
 
                 if self.keep_max_:
 
-                    filt = {f'{variable}_{f}': v for f, v in dict_alphas.items() if f != 'original' and v > self.pvalue_}
+                    dict_items = dict_alphas.items()
+                    
+                    filt = {f'{variable}_{f}': v for f, v in dict_items if f != 'original' and v > self.pvalue_}
                     
                     columns_to_drop = sorted(filt, key=filt.get)[:-1]
+                    
                     X.drop(columns=columns_to_drop, inplace=True)
 
                 if self.drop_original_:
