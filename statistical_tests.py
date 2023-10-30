@@ -7,74 +7,69 @@ from scipy import stats
 """
 Statistical tests to check whether a distribution is normal.
 """
-def dagostino_test(data, alpha=0.05, verbose=0):
+def apply_dagostino_test(variable, alpha=0.05, return_p=True):
 
-    _, p = stats.normaltest(data)
+    _, p = stats.normaltest(variable)
+    
     result = 'Not normal' if p < alpha else 'Normal'
 
-    return result if verbose == 0 else f'{result}, {round(p, 4)}'
+    return (result, p) if return_p else result
 
 
-def kurtosis_test(data, alpha=0.05, verbose=0):
+def apply_kurtosis_test(variable, alpha=0.05, return_p=True):
 
-    _, p = stats.kurtosistest(data)
+    _, p = stats.kurtosistest(variable)
+    
     result = 'Not normal' if p < alpha else 'Normal'
 
-    return result if verbose == 0 else f'{result}, {round(p, 4)}'
+    return (result, p) if return_p else result
 
 
-def skewness_test(data, alpha=0.05, verbose=0):
+def apply_skewness_test(variable, alpha=0.05, return_p=True):
 
-    _, p = stats.skewtest(data)
+    _, p = stats.skewtest(variable)
+    
     result = 'Not normal' if p < alpha else 'Normal'
 
-    return result if verbose == 0 else f'{result}, {round(p, 4)}'
+    return (result, p) if return_p else result
 
 
-def normal_tests(data, alpha=0.05, verbose=0):
+def apply_normal_tests(variable, alpha=0.05, return_p=False, return_kurt_skew=False):
 
-    yj, _ = stats.yeojohnson(data)
-    sq = np.sqrt(data)
-    cb = np.cbrt(data)
-    log = np.log(data)
+    yj, _ = stats.yeojohnson(variable)
+    sq = np.sqrt(variable)
+    cb = np.cbrt(variable)
+    log = np.log(variable)
+    
+    dict_normal_tests = {
+        'Original': apply_dagostino_test(variable, alpha=alpha, return_p=return_p),
+        'Sqrt': apply_dagostino_test(sq, alpha=alpha, return_p=return_p),
+        'Cube Root': apply_dagostino_test(cb, alpha=alpha, return_p=return_p),
+        'Log': apply_dagostino_test(log, alpha=alpha, return_p=return_p),
+        'Yeo Johnson': apply_dagostino_test(yj, alpha=alpha, return_p=return_p)
+    }
+    
+    dict_result = {'Normal Testes': dict_normal_tests}
+    
+    if return_kurt_skew:
+    
+        dict_skewness_tests = {
+            'Original': apply_skewness_test(variable, alpha=alpha, return_p=return_p),
+            'Sqrt': apply_skewness_test(sq, alpha=alpha, return_p=return_p),
+            'Cube Root': apply_skewness_test(cb, alpha=alpha, return_p=return_p),
+            'Log': apply_skewness_test(log, alpha=alpha, return_p=return_p),
+            'Yeo Johnson': apply_skewness_test(yj, alpha=alpha, return_p=return_p)
+        }
 
-    result = pd.DataFrame(
-        {
-            'Skewness': [
-                stats.skew(data),
-                stats.skew(sq),
-                stats.skew(cb),
-                stats.skew(log),
-                stats.skew(yj)
-                ],
-            'Skewness Test': [
-                skewness_test(data, alpha=alpha, verbose=verbose),
-                skewness_test(sq, alpha=alpha, verbose=verbose),
-                skewness_test(cb, alpha=alpha, verbose=verbose),
-                skewness_test(log, alpha=alpha, verbose=verbose),
-                skewness_test(yj, alpha=alpha, verbose=verbose)
-                ],
-            'Kurtosis': [
-                stats.kurtosis(data),
-                stats.kurtosis(sq),
-                stats.kurtosis(cb),
-                stats.kurtosis(log),
-                stats.kurtosis(yj)
-                ],
-            'Kurtosis Test': [
-                kurtosis_test(data, alpha=alpha, verbose=verbose),
-                kurtosis_test(sq, alpha=alpha, verbose=verbose),
-                kurtosis_test(cb, alpha=alpha, verbose=verbose),
-                kurtosis_test(log, alpha=alpha, verbose=verbose),
-                kurtosis_test(yj, alpha=alpha, verbose=verbose)
-                ],
-            'Normal Test': [
-                dagostino_test(data, alpha=alpha, verbose=verbose),
-                dagostino_test(sq, alpha=alpha, verbose=verbose),
-                dagostino_test(cb, alpha=alpha, verbose=verbose),
-                dagostino_test(log, alpha=alpha, verbose=verbose),
-                dagostino_test(yj, alpha=alpha, verbose=verbose)
-                ]
-         }, index=['default', 'sqrt', 'cuberoot', 'log', 'yeojohnson'])
+        dict_kurtosis_tests = {
+            'Original': apply_kurtosis_test(variable, alpha=alpha, return_p=return_p),
+            'Sqrt': apply_kurtosis_test(sq, alpha=alpha, return_p=return_p),
+            'Cube Root': apply_kurtosis_test(cb, alpha=alpha, return_p=return_p),
+            'Log': apply_kurtosis_test(log, alpha=alpha, return_p=return_p),
+            'Yeo Johnson': apply_kurtosis_test(yj, alpha=alpha, return_p=return_p)
+        }
+    
+        dict_result.update(
+            {'Skewness Tests': dict_skewness_tests, 'Kurtosis Tests': dict_kurtosis_tests})
 
-    return result
+    return dict_result
