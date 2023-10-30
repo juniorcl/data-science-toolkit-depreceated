@@ -49,7 +49,7 @@ def apply_normal_tests(variable, alpha=0.05, return_p=False, return_kurt_skew=Fa
         'Yeo Johnson': apply_dagostino_test(yj, alpha=alpha, return_p=return_p)
     }
     
-    dict_result = {'Normal Testes': dict_normal_tests}
+    dict_result = {'Normal Tests': dict_normal_tests}
     
     if return_kurt_skew:
     
