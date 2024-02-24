@@ -1,7 +1,8 @@
 import numpy  as np
 import pandas as pd
+
+from scipy  import stats
 from typing import List
-from scipy import stats
 
 
 class GaussianTransformer(object):
