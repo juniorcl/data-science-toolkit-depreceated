@@ -3,35 +3,9 @@ import pandas as pd
 
 from scipy import stats
 
-
-"""
-Statistical tests to check whether a distribution is normal.
-"""
-def apply_dagostino_test(variable: pd.Series, alpha: float = 0.05, return_p: bool = True):
-
-    _, p = stats.normaltest(variable)
-    
-    result = 'Not normal' if p < alpha else 'Normal'
-
-    return (result, p) if return_p else result
-
-
-def apply_kurtosis_test(variable: pd.Series, alpha: float = 0.05, return_p: bool = True):
-
-    _, p = stats.kurtosistest(variable)
-    
-    result = 'Not normal' if p < alpha else 'Normal'
-
-    return (result, p) if return_p else result
-
-
-def apply_skewness_test(variable: pd.Series, alpha: float = 0.05, return_p: bool = True):
-
-    _, p = stats.skewtest(variable)
-    
-    result = 'Not normal' if p < alpha else 'Normal'
-
-    return (result, p) if return_p else result
+from .kurtosis_test  import  apply_kurtosis_test
+from .skewness_test  import  apply_skewness_test
+from .dagostino_test import apply_dagostino_test
 
 
 def apply_normal_tests(variable: pd.Series, alpha: float = 0.05, return_p: bool = False, return_kurt_skew: bool = False):
