@@ -6,6 +6,8 @@ def calc_macd(df, period_long=26, period_short=12, period_signal=9, column='clos
     """
     Function to calculate the Moving Average Convergence Divergence (MACD) indicator and Signal Line.
 
+    Source: https://www.quantifiedstrategies.com/python-and-macd-trading-strategy/
+
     Parameters
     ----------
     df : DataFrame
@@ -36,9 +38,9 @@ def calc_macd(df, period_long=26, period_short=12, period_signal=9, column='clos
 
     df = calc_ewm(df, period_short, column=column)
 
-    df['macd_val'] = df[f'ewm_{period_short}'] - df[f'ewm_{period_long}']
+    df['macd'] = df[f'ewm_{period_short}'] - df[f'ewm_{period_long}']
 
-    df['macd_signal_line'] = df['macd_val'].ewm(ignore_na=False, min_periods=0, com=period_signal, adjust=True).mean()
+    df['macd_signal'] = df['macd'].ewm(ignore_na=False, min_periods=0, com=period_signal, adjust=True).mean()
 
     if drop_ewm:
         

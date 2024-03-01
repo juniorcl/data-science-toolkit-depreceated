@@ -6,6 +6,8 @@ def calc_bollinger_band(df, column='adj_close', n=20, k=2):
         - Middle Bollinger Band;
         - Lower Bollinger Band.
 
+    Source: https://www.codearmo.com/python-tutorial/bollinger-bands-python
+
     Parameters
     ----------
     df : DataFrame
