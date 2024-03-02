@@ -1,7 +1,7 @@
 import numpy  as np
 import pandas as pd
 
-from scipy import stats
+from scipy.stats import yeojohnson
 
 from .kurtosis_test  import  apply_kurtosis_test
 from .skewness_test  import  apply_skewness_test
@@ -10,7 +10,7 @@ from .dagostino_test import apply_dagostino_test
 
 def apply_normal_tests(variable: pd.Series, alpha: float = 0.05, return_p: bool = False, return_kurt_skew: bool = False):
 
-    yj, _ = stats.yeojohnson(variable)
+    yj, _ = yeojohnson(variable)
     sq = np.sqrt(variable)
     cb = np.cbrt(variable)
     log = np.log(variable)

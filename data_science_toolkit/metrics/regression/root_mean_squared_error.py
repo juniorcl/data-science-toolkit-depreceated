@@ -1,4 +1,5 @@
-from numpy import sqrt
+import numpy as np
+
 from sklearn.metrics import mean_squared_error
 
 
@@ -23,6 +24,6 @@ def root_mean_squared_error(y_true, y_pred):
 
     mse = mean_squared_error(y_true, y_pred)
 
-    rmse = sqrt(mse)
+    rmse = np.sqrt(mse)
 
     return rmse

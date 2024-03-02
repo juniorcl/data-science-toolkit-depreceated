@@ -1,4 +1,5 @@
-from numpy import round
+import numpy as np
+
 from sklearn.metrics import r2_score, mean_absolute_error, mean_absolute_percentage_error, median_absolute_error
 from .root_mean_squared_error import root_mean_squared_error
 
@@ -39,7 +40,7 @@ def get_regression_metrics(y, col_target='target', col_pred='pred', decimals=0):
     medae = median_absolute_error(y[col_target], y[col_pred])
 
     dict_results = {
-        "R2": round(r2, decimals), "RMSE": round(rmse, decimals), 
-        "MAE": round(mae, decimals), "MAPE": round(mape, decimals), "MedAE": round(medae, decimals)}
+        "R2": np.round(r2, decimals), "RMSE": np.round(rmse, decimals), 
+        "MAE": np.round(mae, decimals), "MAPE": np.round(mape, decimals), "MedAE": np.round(medae, decimals)}
 
     return dict_results

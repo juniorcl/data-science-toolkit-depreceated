@@ -1,11 +1,11 @@
 import pandas as pd
 
-from scipy import stats
+from scipy.stats import normaltest
 
 
 def apply_dagostino_test(variable: pd.Series, alpha: float = 0.05, return_p: bool = True):
 
-    _, p = stats.normaltest(variable)
+    _, p = normaltest(variable)
     
     result = 'Not normal' if p < alpha else 'Normal'
 

@@ -1,8 +1,9 @@
 import numpy  as np
 import pandas as pd
 
-from scipy  import stats
 from typing import List
+
+from scipy.stats import normaltest, yeojohnson
 
 
 class GaussianTransformer(object):
@@ -50,28 +51,28 @@ class GaussianTransformer(object):
             
             self.lmbdas_[variable] = {}
 
-            _, alpha = stats.normaltest(X[variable])
+            _, alpha = normaltest(X[variable])
             
             self.alpha_results_[variable]['original'] = alpha
             
-            transformed_data, lmbda = stats.yeojohnson(X[variable])
-            _, alpha = stats.normaltest(transformed_data)
+            transformed_data, lmbda = yeojohnson(X[variable])
+            _, alpha = normaltest(transformed_data)
             
             self.alpha_results_[variable]['yj'] = alpha
             self.lmbdas_[variable] = lmbda
 
             transformed_data = np.log(X[variable])
-            _, alpha = stats.normaltest(transformed_data)
+            _, alpha = normaltest(transformed_data)
             
             self.alpha_results_[variable]['log'] = alpha
 
             transformed_data = np.sqrt(X[variable])
-            _, alpha = stats.normaltest(transformed_data)
+            _, alpha = normaltest(transformed_data)
             
             self.alpha_results_[variable]['sqrt'] = alpha
 
             transformed_data = np.cbrt(X[variable])
-            _, alpha = stats.normaltest(transformed_data)
+            _, alpha = normaltest(transformed_data)
             
             self.alpha_results_[variable]['cbrt'] = alpha
 
@@ -93,7 +94,7 @@ class GaussianTransformer(object):
                 
                 if dict_alphas['yj'] > self.pvalue_:
                     
-                    X[variable + '_yj'] = stats.yeojohnson(X[variable], lmbda=self.lmbdas_[variable]) 
+                    X[variable + '_yj'] = yeojohnson(X[variable], lmbda=self.lmbdas_[variable]) 
 
                 if dict_alphas['log'] > self.pvalue_:
                     
