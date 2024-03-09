@@ -1,5 +1,7 @@
+from .aggregations.numerical_aggregations    import agg_num
 from .transformations.gaussian_transfomation import GaussianTransformer
 
 __all__ = [
-    "GaussianTransformer"
+    "GaussianTransformer",
+    "agg_num"
 ]
