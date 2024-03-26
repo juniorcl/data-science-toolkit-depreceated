@@ -1,5 +1,7 @@
 import numpy as np
 
+from scipy.stats import kurtosis
+
 
 def agg_num(df, groupby, variables, quantiles=[0.25, 0.50, 0.75]):
 
@@ -27,7 +29,8 @@ def agg_num(df, groupby, variables, quantiles=[0.25, 0.50, 0.75]):
     """
 
     list_funcs = [
-        'sum', 'mean', 'median', 'min', 'max', 'std', 'var', ('range', lambda i: np.max(i) - np.min(i))]
+        'sum', 'mean', 'median', 'min', 'max', 'std', 'var', 'skew',
+        ('kurtosis', kurtosis), ('range', lambda i: np.max(i) - np.min(i))]
     
     list_quantiles = [
         (f'quantile_{q}', lambda i, q=q: np.quantile(i, q=q)) for q in quantiles]
