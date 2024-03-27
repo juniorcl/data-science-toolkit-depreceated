@@ -1,9 +1,8 @@
-import numpy as np
+import numpy  as np
+import pandas as pd
 
-from scipy.stats import kurtosis
 
-
-def agg_num(df, groupby, variables, quantiles=[0.25, 0.50, 0.75]):
+def agg_num(df, groupby, variables, quantiles=[0.05, 0.25, 0.75, 0.95]):
 
     """
     Function to calculate a list of mathematical functions
@@ -21,7 +20,7 @@ def agg_num(df, groupby, variables, quantiles=[0.25, 0.50, 0.75]):
 
     quantiles : List
         List of numbers of quantiles to calculate.
-    
+
     Returns
     -------
     df_agg : DataFrame
@@ -30,11 +29,11 @@ def agg_num(df, groupby, variables, quantiles=[0.25, 0.50, 0.75]):
 
     list_funcs = [
         'sum', 'mean', 'median', 'min', 'max', 'std', 'var', 'skew',
-        ('kurtosis', kurtosis), ('range', lambda i: np.max(i) - np.min(i))]
-    
+        ('kurtosis', pd.Series.kurtosis), ('range', lambda i: np.max(i) - np.min(i))]
+
     list_quantiles = [
-        (f'quantile_{q}', lambda i, q=q: np.quantile(i, q=q)) for q in quantiles]
-    
+        (f'quantile_{q}', lambda i, q=q: pd.Series.quantile(i, q=q)) for q in quantiles]
+
     list_funcs.extend(list_quantiles)
 
     dict_funcs = {var: list_funcs for var in variables}
