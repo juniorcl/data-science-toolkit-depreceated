@@ -178,3 +178,7 @@ pyrightconfig.json
 # ignore files
 *.txt
 *.csv
+
+# ignore folders
+data
+notebooks
