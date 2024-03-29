@@ -28,7 +28,7 @@ def agg_num(df, groupby, variables, quantiles=[0.25, 0.50, 0.75]):
     """
 
     list_funcs = [
-        'sum', 'mean', 'median', 'min', 'max', 'std', 'var', 
+        'sum', 'mean', 'median', 'min', 'max', 'std', 'var', 'skew',
         ('kurtosis', lambda i: pd.Series.kurtosis), ('range', lambda i: np.max(i) - np.min(i))]
     
     list_quantiles = [
