@@ -2,7 +2,7 @@ import numpy  as np
 import pandas as pd
 
 
-def agg_num(df, groupby, variables, quantiles=[0.05, 0.25, 0.75, 0.95]):
+def agg_num(df, groupby, variables, calc_kurt=True, quantiles=[0.05, 0.25, 0.75, 0.95]):
 
     """
     Function to calculate a list of mathematical functions
@@ -28,13 +28,17 @@ def agg_num(df, groupby, variables, quantiles=[0.05, 0.25, 0.75, 0.95]):
     """
 
     list_funcs = [
-        'sum', 'mean', 'median', 'min', 'max', 'std', 'var', 'skew',
-        ('kurtosis', pd.Series.kurtosis), ('range', lambda i: np.max(i) - np.min(i))]
+        'sum', 'mean', 'median', 'min', 'max', 'std', 'var', 'skew', ('range', lambda i: np.max(i) - np.min(i))]
 
-    list_quantiles = [
-        (f'quantile_{q}', lambda i, q=q: pd.Series.quantile(i, q=q)) for q in quantiles]
+    if calc_kurt:
+        
+        list_funcs.extend([('kurtosis', pd.Series.kurtosis)])
 
-    list_funcs.extend(list_quantiles)
+    if quantiles:
+        
+        list_quantiles = [(f'quantile_{q}', lambda i, q=q: np.nanquantiles(i, q=q)) for q in quantiles]
+        
+        list_funcs.extend(list_quantiles)
 
     dict_funcs = {var: list_funcs for var in variables}
 
