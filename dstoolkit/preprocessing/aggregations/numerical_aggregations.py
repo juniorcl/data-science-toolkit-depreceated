@@ -18,8 +18,12 @@ def agg_num(df, groupby, variables, calc_kurt=True, quantiles=[0.05, 0.25, 0.75,
     variables : List
         List of variables to apply the functions.
 
-    quantiles : List
+    calc_kurt : Bool
+        parameter to calculate or not calculate kurtosis.
+
+    quantiles : List or Bool
         List of numbers of quantiles to calculate.
+        None or False to not calculate quantiles. 
 
     Returns
     -------
