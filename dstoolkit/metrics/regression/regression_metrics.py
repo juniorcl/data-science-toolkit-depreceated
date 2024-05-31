@@ -1,7 +1,6 @@
 import numpy as np
 
-from sklearn.metrics import r2_score, mean_absolute_error, mean_absolute_percentage_error, median_absolute_error
-from .root_mean_squared_error import root_mean_squared_error
+from sklearn import metrics
 
 
 def get_regression_metrics(y, col_target='target', col_pred='pred', decimals=0):
@@ -29,15 +28,15 @@ def get_regression_metrics(y, col_target='target', col_pred='pred', decimals=0):
         Dictionary with metric results.
     """
 
-    r2 = r2_score(y[col_target], y[col_pred])
+    r2 = metrics.r2_score(y[col_target], y[col_pred])
 
-    rmse = root_mean_squared_error(y[col_target], y[col_pred])
+    rmse = metrics.root_mean_squared_error(y[col_target], y[col_pred])
 
-    mae = mean_absolute_error(y[col_target], y[col_pred])
+    mae = metrics.mean_absolute_error(y[col_target], y[col_pred])
 
-    mape = mean_absolute_percentage_error(y[col_target], y[col_pred])
+    mape = metrics.mean_absolute_percentage_error(y[col_target], y[col_pred])
 
-    medae = median_absolute_error(y[col_target], y[col_pred])
+    medae = metrics.median_absolute_error(y[col_target], y[col_pred])
 
     dict_results = {
         "R2": np.round(r2, decimals), "RMSE": np.round(rmse, decimals), 
