@@ -1,7 +1,7 @@
-from .lightgbm.lightgbm import auto_modeling_lightgbm_regressor_cv, fit_lightgbm_regressor_cv
+from .lightgbm.lightgbm import automl_lgbm_regressor_cv, fit_lgbm_regressor_cv
 
 
 __all__ = [
-    "auto_modeling_lightgbm_regressor_cv",
-    "fit_lightgbm_regressor_cv"
+    "automl_lgbm_regressor_cv",
+    "fit_lgbm_regressor_cv"
 ]

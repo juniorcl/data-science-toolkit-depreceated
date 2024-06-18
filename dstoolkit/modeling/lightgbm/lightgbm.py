@@ -4,15 +4,16 @@ from lightgbm import LGBMRegressor
 
 from sklearn.model_selection import cross_validate
 
-from ...variable_analysis.shap.summary_shap                     import get_tree_shap_values
-from ...metrics.regression.regression_metrics                   import get_regression_metrics
-from ...optimization.optuna.hyperparameter_tuning               import tune_params_lightgbm_regression_cv
-from ...feature_selection.boruta.boruta_regression              import boruta_shap_regression
-from ...feature_selection.sklearn.select_from_model             import select_from_model
-from ...variable_analysis.feature_importance.feature_importance import get_tree_feature_importance
+from ...variable_analysis.shap.summary_shap                         import get_tree_summary_plot
+from ...metrics.regression.regression_metrics                       import get_regression_metrics
+from ...optimization.optuna.hyperparameter_tuning                   import tune_params_lightgbm_regression_cv
+from ...feature_selection.boruta.boruta_regression                  import boruta_shap_regression
+from ...feature_selection.sklearn.select_from_model                 import select_from_model
+from ...variable_analysis.feature_importance.feature_importance     import get_tree_feature_importance
+from ...variable_analysis.feature_importance.permutation_importance import get_permutation_importance
 
 
-def fit_lightgbm_regressor_cv(X_train, y_train, X_test, y_test, target, cv=3, params=None, random_state=42):
+def fit_lgbm_regressor_cv(X_train, y_train, X_test, y_test, target, cv=3, params=None, random_state=42):
 
     cat_columns = X_train.select_dtypes(include='object')
 
@@ -25,20 +26,17 @@ def fit_lightgbm_regressor_cv(X_train, y_train, X_test, y_test, target, cv=3, pa
 
     print('---------------> Modeling')
 
-    init_params = {'objective': 'regression', 'metric': 'rmse', 'verbosity': -1, 'random_state': random_state, "bagging_freq": 1, 'n_jobs': -1}
+    init_params = {'objective': 'regression', 'verbosity': -1, 'random_state': random_state, "bagging_freq": 1, 'n_jobs': -1}
     
     if params:
         
-        params.update(**init_params)
-        model = LGBMRegressor(**params)
-    
-    else:
+        init_params.update(params)
 
-        model = LGBMRegressor(**init_params)
+    model = LGBMRegressor(**init_params)
     
-    cv_results = cross_validate(
-        estimator=model, X=X_train, y=y_train['target'], cv=3,
-        scoring=['r2', 'neg_mean_absolute_error', 'neg_root_mean_squared_error', 'neg_median_absolute_error', 'neg_mean_absolute_percentage_error'])
+    list_reg_scores = ['r2', 'neg_mean_absolute_error', 'neg_root_mean_squared_error', 'neg_median_absolute_error', 'neg_mean_absolute_percentage_error']
+
+    cv_results = cross_validate(estimator=model, X=X_train, y=y_train['target'], cv=cv, scoring=list_reg_scores)
 
     r2_mean = np.round(cv_results['test_r2'].mean(), 2)
     mae_mean = np.round(cv_results['test_neg_mean_absolute_error'].mean() * -1, 2)
@@ -58,16 +56,19 @@ def fit_lightgbm_regressor_cv(X_train, y_train, X_test, y_test, target, cv=3, pa
     print(f"Cross Validation  R2: {r2_mean}, MAE: {mae_mean}, RMSE: {rmse_mean}, MAPE: {mape_mean}, MedAE: {medae_mean}")
     print(f"Test  Validation  R2: {r2}, MAE: {mae}, RMSE: {rmse}, MAPE: {mape}, MedAE: {medae}")
 
+    return model
 
-def auto_modeling_lightgbm_regressor_cv(
+
+def automl_lgbm_regressor_cv(
     X_train, y_train, X_test, y_test, selection_method='sfm', target='target', cv=3, n_trials=100, scoring='r2', direction='maximize'):
 
+    dict_results = {}
+    
     print('--------> Standard Model')
 
-    fit_lightgbm_regressor_cv(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, target=target, cv=cv)
+    _ = fit_lgbm_regressor_cv(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, target=target, cv=cv)
 
-    print()
-    print('--------> Feature Selection')
+    print('\n--------> Feature Selection')
 
     if selection_method == 'sfm':
 
@@ -76,42 +77,49 @@ def auto_modeling_lightgbm_regressor_cv(
         list_selected_features = select_from_model(
             estimator=LGBMRegressor(verbosity=-1, random_state=42, n_jobs=-1), X_train=X_train, y_train=y_train, target=target)
 
+        dict_results['selected_features'] = list_selected_features
+    
     elif selection_method == 'boruta':
 
         print('---------------> Boruta Shap')
 
         list_selected_features = boruta_shap_regression(
-            model=LGBMRegressor(verbosity=-1, random_state=42, n_jobs=-1), X_train=X_train, n_trials=100, 
-            sample=False, train_or_test='test', normalize=True, verbose=False)
+            X_train=X_train, y_train=y_train, model=LGBMRegressor(verbosity=-1, random_state=42, n_jobs=-1), 
+            n_trials=100, sample=False, train_or_test='test', normalize=True, verbose=False)
 
-    else:
-
-        list_selected_features = X_train.columns.tolist()
+        dict_results['selected_features'] = list_selected_features
     
-    fit_lightgbm_regressor_cv(
+    _ = fit_lgbm_regressor_cv(
         X_train=X_train[list_selected_features], y_train=y_train, 
         X_test=X_test[list_selected_features], y_test=y_test, target=target, cv=cv)
-
-    print()
-    print('--------> Hyperparameter Tuning')
-    params = tune_params_lightgbm_regression_cv(
-        X_train, y_train, list_selected_features, n_trials=n_trials, target='target', scoring=scoring, direction=direction)
     
-    fit_lightgbm_regressor_cv(
-        X_train=X_train[list_selected_features], y_train=y_train, 
-        X_test=X_test[list_selected_features], y_test=y_test, target='target', cv=cv, params=params)
+    print('\n--------> Hyperparameter Tuning')
+    
+    params = tune_params_lgbm_regression_cv(
+        X_train, y_train, list_selected_features, n_trials=n_trials, target=target, scoring=scoring, direction=direction)
 
-    print()
-    print('--------> Final Modeling')
-    model = LGBMRegressor(**params)
-    model.fit(X_train[list_selected_features], y_train[target])
+    dict_results['best_params'] = params
+    
+    model = fit_lgbm_regressor_cv(
+        X_train=X_train[list_selected_features], y_train=y_train, X_test=X_test[list_selected_features], 
+        y_test=y_test, target=target, cv=cv, params=params)
 
-    print()
-    print('--------> Feature Importance')
+    dict_results['model'] = model
+    
+    print('\n--------> Feature Importance')
+    
     df_imp = get_tree_feature_importance(model, X_train[list_selected_features])
 
-    print()
-    print('--------> Shap Values')
-    get_tree_shap_values(model, X_train[list_selected_features])
+    dict_results['feature_importance'] = df_imp
+
+    print('\n--------> Permutation Importance')
+
+    df_perm = get_permutation_importance(model, X[list_selected_features], y[target], scoring=scoring, random_state=42, n_repeats=5)
+
+    dict_results['permutation_importance'] = df_perm
     
-    return model, df_imp
+    print('\n--------> Shap Values')
+    
+    get_tree_summary_plot(model, X_train[list_selected_features])
+
+    return dict_results
