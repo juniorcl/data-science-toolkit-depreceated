@@ -5,7 +5,7 @@ from lightgbm import LGBMRegressor
 from sklearn.model_selection import cross_validate
 
 
-def tune_params_lightgbm_regression_cv(X_train, y_train, selected_features, n_trials=100, target='target', scoring='r2', direction='maximize'):
+def tune_params_lgbm_regression_cv(X_train, y_train, selected_features, n_trials=100, target='target', scoring='r2', direction='maximize'):
     
     def objective(trial):
     
