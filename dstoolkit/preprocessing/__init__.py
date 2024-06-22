@@ -1,5 +1,4 @@
-from .aggregations.numerical_aggregation     import agg_num
-from .aggregations.categorical_aggregation   import agg_cat
+from .aggregations.numerical_aggregations    import agg_num
 from .transformations.gaussian_transfomation import GaussianTransformer
 
 __all__ = [

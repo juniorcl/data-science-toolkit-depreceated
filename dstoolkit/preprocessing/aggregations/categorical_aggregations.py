@@ -1,10 +1,18 @@
-import numpy as np
-
-
-def agg_num(df, groupby, variables, quantiles=[0.25, 0.50, 0.75]):
+def categorical_mode(arr):
 
     """
-    Function to calculate a list of mathematical functions
+    Returns the most frequent value in a numpy array.
+    """
+    
+    arr = list(arr)
+    
+    return max(set(arr), key=arr.count)
+
+
+def agg_cat(df, groupby, variables):
+
+    """
+    Function to calculate nunique and mode from a Series
 
     Parameters
     ----------
@@ -16,9 +24,6 @@ def agg_num(df, groupby, variables, quantiles=[0.25, 0.50, 0.75]):
 
     variables : List
         List of variables to apply the functions.
-
-    quantiles : List
-        List of numbers of quantiles to calculate.
     
     Returns
     -------
@@ -26,13 +31,7 @@ def agg_num(df, groupby, variables, quantiles=[0.25, 0.50, 0.75]):
         Result DataFrame. 
     """
 
-    list_funcs = [
-        'sum', 'mean', 'median', 'min', 'max', 'std', 'var', ('range', lambda i: np.max(i) - np.min(i))]
-    
-    list_quantiles = [
-        (f'quantile_{q}', lambda i, q=q: np.quantile(i, q=q)) for q in quantiles]
-    
-    list_funcs.extend(list_quantiles)
+    list_funcs = ['nunique', categorical_mode]
 
     dict_funcs = {var: list_funcs for var in variables}
 
