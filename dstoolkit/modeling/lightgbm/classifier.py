@@ -4,8 +4,8 @@ from lightgbm import LGBMClassifier
 
 from sklearn.model_selection import cross_validate
 
+from ...optimization.optuna.lightgbm                                import tune_params_lgbm_classifier_cv
 from ...variable_analysis.shap.summary_shap                         import get_tree_summary_plot
-from ...optimization.optuna.lightgbm                   import tune_params_lgbm_classifier_cv
 from ...feature_selection.boruta.classification                     import boruta_shap_classification
 from ...feature_selection.sklearn.select_from_model                 import select_from_model
 from ...metrics.classification.classification_metrics               import get_classification_metrics
@@ -13,7 +13,7 @@ from ...variable_analysis.feature_importance.feature_importance     import get_t
 from ...variable_analysis.feature_importance.permutation_importance import get_permutation_importance
 
 
-def fit_lgbm_classifier_cv(X_train, y_train, X_test, y_test, target, cv=3, params=None, scoring='roc_auc', random_state=42):
+def fit_lgbm_classifier_cv(X_train, y_train, X_test, y_test, target, cv=3, params=None, random_state=42):
 
     cat_columns = X_train.select_dtypes(include='object')
 
@@ -26,7 +26,7 @@ def fit_lgbm_classifier_cv(X_train, y_train, X_test, y_test, target, cv=3, param
 
     print('---------------> Modeling')
 
-    init_params = {'objective': 'binary', 'metric': scoring, 'verbosity': -1, 'random_state': random_state, "bagging_freq": 1, 'n_jobs': -1}
+    init_params = {'verbosity': -1, 'random_state': random_state, 'n_jobs': -1}
     
     if params:
         
@@ -61,7 +61,9 @@ def automl_lgbm_classifier_cv(X_train, y_train, X_test, y_test, selection_method
     
     print('--------> Standard Model')
 
-    _ = fit_lgbm_classifier_cv(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, target=target, cv=cv)
+    standard_model = fit_lgbm_classifier_cv(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, target=target, cv=cv, random_state=random_state)
+
+    dict_results['standard_model'] = standard_model
 
     print('\n--------> Feature Selection')
 
@@ -84,20 +86,23 @@ def automl_lgbm_classifier_cv(X_train, y_train, X_test, y_test, selection_method
 
         dict_results['selected_features'] = list_selected_features
     
-    _ = fit_lgbm_classifier_cv(
+    selected_features_model = fit_lgbm_classifier_cv(
         X_train=X_train[list_selected_features], y_train=y_train, 
-        X_test=X_test[list_selected_features], y_test=y_test, target=target, cv=cv)
+        X_test=X_test[list_selected_features], y_test=y_test, target=target, cv=cv, random_state=random_state)
+    
+    dict_results['selected_features_model'] = selected_features_model
     
     print('\n--------> Hyperparameter Tuning')
     
     params = tune_params_lgbm_classifier_cv(
-        X_train, y_train, list_selected_features, n_trials=n_trials, target=target, scoring=scoring, direction=direction)
+        X_train, y_train, list_selected_features, n_trials=n_trials, 
+        target=target, scoring=scoring, direction=direction, random_state=random_state)
 
     dict_results['best_params'] = params
     
     model = fit_lgbm_classifier_cv(
-        X_train=X_train[list_selected_features], y_train=y_train, X_test=X_test[list_selected_features], 
-        y_test=y_test, target=target, cv=cv, params=params)
+        X_train=X_train[list_selected_features], y_train=y_train, 
+        X_test=X_test[list_selected_features], y_test=y_test, target=target, cv=cv, params=params, random_state=random_state)
 
     dict_results['model'] = model
     
