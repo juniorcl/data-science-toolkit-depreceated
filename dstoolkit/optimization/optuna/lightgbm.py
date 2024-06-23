@@ -13,6 +13,7 @@ def tune_params_lgbm_regressor_cv(X_train, y_train, selected_features, n_trials=
             "bagging_freq": 1,
             "n_jobs": -1,
             "metric": scoring,
+            "random_state": random_state,
             "learning_rate": trial.suggest_float("learning_rate", 1e-3, 0.1, log=True),
             "num_leaves": trial.suggest_int("num_leaves", 2, 2**10),
             "subsample": trial.suggest_float("subsample", 0.05, 1.0),
