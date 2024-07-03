@@ -4,9 +4,13 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-def get_tree_feature_importance(model, X_train):
+def get_tree_feature_importance(model, X, selected_features=None):
+
+    if selected_features:
+
+        X = X.loc[:, selected_features]
     
-    df_imp = pd.DataFrame(model.feature_importances_, X_train.columns).reset_index()
+    df_imp = pd.DataFrame(model.feature_importances_, X.columns).reset_index()
     df_imp.columns = ["Variable", "Importance"]
     df_imp = df_imp.sort_values("Importance", ascending=False)
     
