@@ -1,7 +1,7 @@
 import optuna
 import numpy as np
 from lightgbm import LGBMRegressor, LGBMClassifier
-from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+from sklearn.metrics import r2_score, mean_absolute_error, root_mean_squared_error
 from sklearn.model_selection import cross_validate
 
 
@@ -120,8 +120,7 @@ def tune_params_lgbm_regressor(X_train, y_train, X_valid, y_valid, selected_feat
                 score = mean_absolute_error(y_valid[target], y_valid['pred'])
 
             case 'rmse':
-                score = mean_squared_error(y_valid[target], y_valid['pred'])
-                score = np.sqrt(score)
+                score = root_mean_squared_error(y_valid[target], y_valid['pred'])
 
             case _:
                 score = r2_score(y_valid[target], y_valid['pred'])
