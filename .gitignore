@@ -181,3 +181,5 @@ pyrightconfig.json
 
 # ignore folders
 data
+
+notebooks/dstoolkit
