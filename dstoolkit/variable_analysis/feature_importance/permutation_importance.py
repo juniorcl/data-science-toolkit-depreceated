@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from sklearn.inspection import permutation_importance
 
 
-def get_permutation_importance(model, X, y, scoring, target='target', selected_features=None, random_state=42, n_repeats=5):
+def get_permutation_importance(model, X, y, scoring='roc_auc', target='target', selected_features=None, random_state=42, n_repeats=5):
 
     if selected_features:
 

@@ -76,7 +76,7 @@ def automl_lgbm_classifier_cv(
         print('\n--------> Feature Selection', '\n---------------> Select From Model')
         
         list_selected_features = select_from_model(
-            estimator=LGBMClassifier(verbosity=-1, random_state=random_state, n_jobs=-1), X_train=X_train, y_train=y_train, target=target)
+            estimator=LGBMClassifier(verbosity=-1, random_state=random_state, n_jobs=-1), X=X_train, y=y_train, target=target)
 
         dict_results['selected_features'] = list_selected_features
 
@@ -127,7 +127,7 @@ def automl_lgbm_classifier_cv(
 
     print('\n--------> Permutation Importance')
 
-    df_perm = get_permutation_importance(model, X, y, target=target, selected_features=list_selected_features, scoring=scoring, random_state=random_state, n_repeats=5)
+    df_perm = get_permutation_importance(model, X_train, y_train, target=target, selected_features=list_selected_features, scoring=scoring, random_state=random_state, n_repeats=5)
 
     dict_results['permutation_importance'] = df_perm
     
@@ -203,7 +203,7 @@ def automl_lgbm_classifier(X_train, y_train, X_valid, y_valid, X_test, y_test, s
 
         print('\n--------> Feature Selection', '\n---------------> Select From Model')
         
-        list_selected_features = select_from_model(estimator=LGBMClassifier(verbosity=-1, random_state=42, n_jobs=-1), X_train=X_train, y_train=y_train, target=target)
+        list_selected_features = select_from_model(estimator=LGBMClassifier(verbosity=-1, random_state=42, n_jobs=-1), X=X_train, y=y_train, target=target)
 
         dict_results['selected_features'] = list_selected_features
 
@@ -217,7 +217,7 @@ def automl_lgbm_classifier(X_train, y_train, X_valid, y_valid, X_test, y_test, s
         print('\n--------> Feature Selection', '\n---------------> Boruta Shap')
 
         list_selected_features = boruta_shap_classification(
-            X_train=X_train, y_train=y_train, model=LGBMClassifier(verbosity=-1, random_state=42, n_jobs=-1), 
+            X=X_train, y=y_train, model=LGBMClassifier(verbosity=-1, random_state=42, n_jobs=-1), 
             n_trials=100, sample=False, train_or_test='test', normalize=True, verbose=False)
 
         dict_results['selected_features'] = list_selected_features
@@ -254,7 +254,7 @@ def automl_lgbm_classifier(X_train, y_train, X_valid, y_valid, X_test, y_test, s
 
     print('\n--------> Permutation Importance')
 
-    df_perm = get_permutation_importance(model, X_test, y_test, target=target, selected_features=list_selected_features, random_state=42, n_repeats=5, scoting='roc_auc')
+    df_perm = get_permutation_importance(model, X_test, y_test, target=target, selected_features=list_selected_features, random_state=random_state, n_repeats=5)
 
     dict_results['permutation_importance'] = df_perm
     

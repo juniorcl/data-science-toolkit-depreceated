@@ -81,7 +81,7 @@ def automl_lgbm_regressor_cv(X_train, y_train, X_test, y_test, selection_method=
         print('\n--------> Feature Selection', '\n---------------> Select From Model')
         
         list_selected_features = select_from_model(
-            estimator=LGBMRegressor(verbosity=-1, random_state=random_state, n_jobs=-1), X_train=X_train, y_train=y_train, target=target)
+            estimator=LGBMRegressor(verbosity=-1, random_state=random_state, n_jobs=-1), X=X_train, y=y_train, target=target)
 
         dict_results['selected_features'] = list_selected_features
 
@@ -96,7 +96,7 @@ def automl_lgbm_regressor_cv(X_train, y_train, X_test, y_test, selection_method=
         print('\n--------> Feature Selection', '\n---------------> Boruta Shap')
 
         list_selected_features = boruta_shap_regression(
-            X_train=X_train, y_train=y_train, model=LGBMRegressor(verbosity=-1, random_state=random_state, n_jobs=-1), 
+            X=X_train, y=y_train, model=LGBMRegressor(verbosity=-1, random_state=random_state, n_jobs=-1), 
             n_trials=100, sample=False, train_or_test='test', normalize=True, verbose=False)
 
         dict_results['selected_features'] = list_selected_features
@@ -209,7 +209,8 @@ def automl_lgbm_regressor(X_train, y_train, X_valid, y_valid, X_test, y_test, se
 
         print('\n--------> Feature Selection', '\n---------------> Select From Model')
         
-        list_selected_features = select_from_model(estimator=LGBMRegressor(verbosity=-1, random_state=42, n_jobs=-1), X_train=X_train, y_train=y_train, target=target)
+        list_selected_features = select_from_model(
+            estimator=LGBMRegressor(verbosity=-1, random_state=42, n_jobs=-1), X=X_train, y=y_train, target=target)
 
         dict_results['selected_features'] = list_selected_features
 
@@ -223,7 +224,7 @@ def automl_lgbm_regressor(X_train, y_train, X_valid, y_valid, X_test, y_test, se
         print('\n--------> Feature Selection', '\n---------------> Boruta Shap')
 
         list_selected_features = boruta_shap_regression(
-            X_train=X_train, y_train=y_train, model=LGBMRegressor(verbosity=-1, random_state=42, n_jobs=-1), 
+            X=X_train, y=y_train, model=LGBMRegressor(verbosity=-1, random_state=42, n_jobs=-1), 
             n_trials=100, sample=False, train_or_test='test', normalize=True, verbose=False)
 
         dict_results['selected_features'] = list_selected_features
