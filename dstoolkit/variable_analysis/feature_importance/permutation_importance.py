@@ -8,7 +8,7 @@ def get_permutation_importance(model, X, y, scoring, target='target', selected_f
     if selected_features:
 
         X = X.loc[:, selected_features]
-    
+
     dict_results = permutation_importance(
         estimator=model, X=X, y=y[target], scoring=scoring, random_state=random_state, n_repeats=n_repeats, n_jobs=-1)
 
